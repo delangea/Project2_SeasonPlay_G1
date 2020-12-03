@@ -5,9 +5,82 @@
     Kylar Hobbs
     Ryan Evelyn-->  
     <head>
+        <style>
+        body {
+            background-color: orange;
+
+        }
+
+        .start {
+            background-color:black;
+            padding: 0.5rem;
+        }
+
+        h1 {
+            color: white;
+            border: 2px solid red;
+            background-color: black;
+            text-align: center;
+            margin: 0;
+            padding: 0.5rem;
+            font-size: 2.5rem;
+        }
+        form {
+            display: flex;
+        }
+        .teams {
+            background-color: white;
+            max-width: 50rem;
+            flex: 1 0 20rem;
+            padding: 3rem;
+            margin-right: 2rem;
+            margin-top: 2rem;
+        }
+        h2 {
+            text-align: center;
+            font-size: 2rem;
+            padding: 0.5rem;
+            border: 2px solid red;
+        }
+        ul {
+            margin: 2rem;
+        }
+        .results {
+            background-color: white;
+            max-width: 50rem;
+            flex: 1 0 20rem;
+            padding: 3rem;
+            margin-right: 2rem;
+            margin-top: 2rem;
+        }
+
+        input[type="button"]{
+            color:black;
+            background-color: white;
+            padding: .5rem;
+            border-radius: 3px;
+            border: 2px solid red;
+            font-weight: bolder;
+            
+        }
+        input[type="button"]:hover{
+            color: white;
+            background-color: red;
+            border: 2px solid black;
+            font-weight: bold;
+            transition: color, background-color 300ms ease-in;
+        }
+
+        </style>
     </head>
     <body>
+        <div class="start">
+        <h1>Let's Play Basketball</h1>
+        </div>
+    <main>
     <form>
+    <div class="teams">
+        <h2>The Teams:</h2>
     <ul id="teamList">
         <li>BYU</li>
         <li>Gonzaga</li>
@@ -20,11 +93,15 @@
         <li>San Francisco</li>
         <li>Santa Clara</li>
     </ul>
+    
     <br><br>
     <input type="button" value="Play Game" onclick="playGame()">
+    </div>
     <br><br>
-    <p>Season Results:</p>
-    <p id="output"></p>    
+    <div class="results">
+    <h2>Season Results:</h2>
+    <p id="output"></p>  
+    </div>  
     </form>
     <script>
 
@@ -37,6 +114,7 @@
         losses;
         winLossPct;
         games;
+        
 
         /*** define Constructor***/
             constructor () {
@@ -44,19 +122,7 @@
                 this.wins = 0; 
                 this.losses = 0;
                 this.winLossPct = 0;
-
-
-                class Game {
-                    myScore;
-                    theirScore;
-                    winOrLoss;
-                    
-                    constructor(pMyScore, pTheirScore,pWinOrLoss){
-                        this.myScore = pMyScore;
-                        this.theirScore = pTheirScore;
-                        this.winOrLoss = pWinOrLoss;
-                    }
-                }
+                this.games = [];
 
             }
         /*** Define Method***/
@@ -70,14 +136,6 @@
             aTeamName = aTeams[pTeamName];
             this.teamName = aTeamName;
         }
-        setWinsLosses(pWins, pLosses) {
-            //receives TWO parameters used to set wins and losses variables
-            this.wins+=pWins;
-            this.losses+=pLosses;
-            //calculate winLossPct variable
-            calcWinLossPct();
-
-        }
         getWins() {
             //returns number of wins
             return this.wins;
@@ -86,12 +144,33 @@
             //returns number of losses
             return this.losses;
         }
-        calcWinLossPct(){
+        calcWinLossPct(pWins, pLosses){
             //calculates and updates winLossPct
-            return this.wins / this.losses;
+            return (getWins()/(2 * aoTeams.length)) + "% winning" + " & " +  (getLosses()/(2 * aoTeams.length)) + "% losing";
+        }
+        setWinsLosses(pWins, pLosses) {
+            //receives TWO parameters used to set wins and losses variables
+            this.wins+=pWins;
+            this.losses+=pLosses;
+            //calculate winLossPct variable
+            this.winLossPct = this.wins/(this.losses + this.wins);
         }
 
+
         }
+
+        class Game {
+                    myScore;
+                    theirScore;
+                    winOrLoss;
+                    
+                    constructor(pMyScore, pTheirScore, pWinOrLoss){
+                        this.myScore = pMyScore;
+                        this.theirScore = pTheirScore;
+                        this.winOrLoss = pWinOrLoss;
+                    }
+        }
+
         // Build the child object extending Parent
         class BasketballTeam extends Team {
             /*** Define Attributes***/
@@ -133,48 +212,85 @@
             aTeams.push(document.getElementById("teamList").childNodes[i].innerHTML);
             i++;
         }
-        // generate game results --> assign to arrays (this pretty much HW5 copy and past would be helpful)
-
-
+        // generate game results --> assign to arrays (this pretty much HW5 copy and past would be helpful
         // sort arrays
-
         // document.getElementById("output").value = seasonResults  
        for (var key in aTeams) {
-                var oTeam = new Team();
-                oTeam.teamName = aTeams[key];
-                aoTeams.push(oTeam);
+            aoTeams[key] = new BasketballTeam();
+            aoTeams[key].teamName = aTeams[key];
 
-         }
-        console.log(aoTeams);
+        }
 
-         function playGame(){
+        function playGame(){
             var numGames = ((aTeams.length - 1)*2);
-            var myTeamScores = [];
+            var myTeamName;
+            var theirTeamName;
 
-            for (i=1;i<=numGames;i++) {
-                //create random score for 2 teams
-                teamName = aTeams[(i+1)];
-                var myScore = Math.floor(Math.random() * 101);
-                var theirScore = Math.floor(Math.random() * 101);
-            
-                //if game number is even, game is away--otherScore gets 5 points added
-                if (i % 2 == 0 && myScore != theirScore) {
-                    myScore = theirScore
-                    theirScore = theirScore + 5
+            for (i=0;i<aTeams.length;i++) {
+                //set first team name (always going to be home)
+                myTeamName = aoTeams[i].getTeam();
+                //set other team name-- loop through all the other teams games (away)
+                for (j=0;j<aTeams.length; j++) {
+                    theirTeamName = aoTeams[(j)].getTeam();
+                    var myScore = Math.floor((Math.random() * 101) + 5);
+                    var theirScore = Math.floor(Math.random() * 101);
+                    //if statement-- team won't play itself
+                    if (myTeamName == theirTeamName) {
+                        j;
+                    }
+                    //team plays all other teams 
+                    else {
+                        if (myScore > theirScore && myScore != theirScore) {
+                            aoTeams[i].setWinsLosses(1,0);
+                            aoTeams[j].setWinsLosses(0,1);
+                            aoTeams[i].games.push(new Game(myScore, theirScore, "W"));
+                            aoTeams[j].games.push(new Game(theirScore, myScore, "L"));
+                            aoTeams[i].addPointsFor(myScore);
+                            aoTeams[i].addPointsAgainst(theirScore);
+                            aoTeams[j].addPointsFor(theirScore);
+                            aoTeams[j].addPointsAgainst(myScore);
+                        }
+                        else if (myScore < theirScore && myScore != theirScore) {
+                            aoTeams[j].setWinsLosses(1,0);
+                            aoTeams[i].setWinsLosses(0,1);
+                            aoTeams[j].games.push(new Game(theirScore, myScore, "W"));
+                            aoTeams[i].games.push(new Game(myScore, theirScore, "L"));
+                            aoTeams[i].addPointsFor(myScore);
+                            aoTeams[i].addPointsAgainst(theirScore);
+                            aoTeams[j].addPointsFor(theirScore);
+                            aoTeams[j].addPointsAgainst(myScore);
+                        }
+                        else {
+                            while (myScore == theirScore)
+                            {
+                                myScore += Math.floor(Math.random() * 16);
+                                theirScore += Math.floor(Math.random() * 16);
+                            }
+                            if (myScore > theirScore && myScore != theirScore) {
+                                aoTeams[i].setWinsLosses(1,0);
+                                aoTeams[j].setWinsLosses(0,1);
+                                aoTeams[i].games.push(new Game(myScore, theirScore , "W"));
+                                aoTeams[j].games.push(new Game(theirScore, myScore, "L"));
+                                aoTeams[i].addPointsFor(myScore);
+                                aoTeams[i].addPointsAgainst(theirScore);
+                                aoTeams[j].addPointsFor(theirScore);
+                                aoTeams[j].addPointsAgainst(myScore);
+                            }
+                            else if (myScore < theirScore && myScore != theirScore) {
+                                aoTeams[j].setWinsLosses(1,0);
+                                aoTeams[i].setWinsLosses(0,1);
+                                aoTeams[j].games.push(new Game(theirScore, myScore, "W"));
+                                aoTeams[i].games.push(new Game(myScore, theirScore, "L"));
+                                aoTeams[i].addPointsFor(myScore);
+                                aoTeams[i].addPointsAgainst(theirScore);
+                                aoTeams[j].addPointsFor(theirScore);
+                                aoTeams[j].addPointsAgainst(myScore);
+                            }
+                        }
+
+                    }
                 }
-                //if game number is odd, game is home--teamScoree gets 5 points added
-                else if (myScore != theirScore) {
-                    myScore = myScore + 5 
-                    theirScore = theirScore
-                }
-                //if game is tied, play until someone wins, then add number of OTs to array
-                else {
-                    do {
-                    myScore = myScore + Math.floor(Math.random() * 16);
-                    theirScore = theirScore + Math.floor(Math.random() * 16);
-                    } while (myScore === theirScore);  
-                }
-            
+            }
             
                 
             //     for (iWin=0;iWin<numGames;iWin++) {
@@ -197,8 +313,9 @@
             }   
             document.getElementById("output").innerHTML = output
         }
-    }
-       
+     
     </script>
+    </main>
 </body>
 </html>
+
